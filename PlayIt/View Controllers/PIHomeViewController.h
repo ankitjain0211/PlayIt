@@ -7,8 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import "RNFrostedSidebar.h"
 
-@interface PIHomeViewController : UIViewController <RNFrostedSidebarDelegate>
+@interface PIHomeViewController : UIViewController <RNFrostedSidebarDelegate, MPMediaPickerControllerDelegate>
+@property (weak, nonatomic) IBOutlet UITableView *songTableView;
 
 @end

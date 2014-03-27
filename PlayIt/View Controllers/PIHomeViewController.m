@@ -14,8 +14,12 @@
 @interface PIHomeViewController ()
 {
     BOOL setAlernativeColor;
+    MPMediaItemCollection	*_userMediaItemCollection;
 }
+
 @property (nonatomic, strong) NSMutableIndexSet *optionIndices;
+@property (nonatomic,strong) MPMusicPlayerController *musicPlayer;
+
 @end
 
 @implementation PIHomeViewController
@@ -26,6 +30,9 @@
     // Defaults
     self.optionIndices = [NSMutableIndexSet indexSetWithIndex:1];
     setAlernativeColor = NO;
+    
+    // To fetch media files from phone library
+    [self pickAudioFiles];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -42,6 +49,132 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark - Fetch Audio Files
+
+-(void)pickAudioFiles {
+    // Call only if media files where not fetched previously
+    if (![[[NSUserDefaults standardUserDefaults] valueForKey:kCacheMediaFiles] count]) {
+        MPMediaPickerController *soundPicker=[[MPMediaPickerController alloc] initWithMediaTypes:MPMediaTypeAnyAudio];
+        soundPicker.delegate=self;
+        soundPicker.allowsPickingMultipleItems=YES;
+        [self presentViewController:soundPicker animated:YES completion:nil];
+    } else {
+    
+    }
+}
+
+#pragma mark - MPMediaPickerController Delegate
+
+-(void)mediaPicker:(MPMediaPickerController *)mediaPicker didPickMediaItems:(MPMediaItemCollection *)mediaItemCollection {
+    // Dismiss controller
+    [mediaPicker dismissViewControllerAnimated:YES completion:nil];
+    // Update or cache the data
+    [self updateTheMediaColledtionsItems:mediaItemCollection];
+}
+
+- (void)updateTheMediaColledtionsItems:(MPMediaItemCollection *)mediaItemCollection {
+    if (_userMediaItemCollection == nil) {
+        _userMediaItemCollection = mediaItemCollection;
+        
+        // Cache the data to avoid calling next time same method to fetch media files
+       // [[NSUserDefaults standardUserDefaults] setValue:[_userMediaItemCollection items] forKey:kCacheMediaFiles];
+        //[[NSUserDefaults standardUserDefaults] synchronize];
+        
+        [self.musicPlayer setQueueWithItemCollection: _userMediaItemCollection];
+        
+        [self.musicPlayer play];
+    } else  {
+        BOOL wasPlaying = NO;
+        if (self.musicPlayer.playbackState ==
+            MPMusicPlaybackStatePlaying) {
+            wasPlaying = YES;
+        }
+        
+        MPMediaItem *nowPlayingItem	= self.musicPlayer.nowPlayingItem;
+        NSTimeInterval currentPlaybackTime	= self.musicPlayer.currentPlaybackTime;
+        NSMutableArray *currentSongsList= [[_userMediaItemCollection items] mutableCopy];
+        
+        NSArray *nowSelectedSongsList = [mediaItemCollection items];
+        
+        [currentSongsList addObjectsFromArray:nowSelectedSongsList];
+        
+        _userMediaItemCollection = [MPMediaItemCollection collectionWithItems:(NSArray *) currentSongsList];
+        [self.musicPlayer setQueueWithItemCollection: _userMediaItemCollection];
+        self.musicPlayer.nowPlayingItem	= nowPlayingItem;
+        self.musicPlayer.currentPlaybackTime = currentPlaybackTime;
+        
+        if (wasPlaying) {
+            
+            [self.musicPlayer play];
+        }
+    }
+    [self.songTableView reloadData];
+}
+
+#pragma mark - Play 
+-(void)playWithMediaItem:(MPMediaItem *)item {
+    self.musicPlayer = [MPMusicPlayerController iPodMusicPlayer];
+    [self.musicPlayer setQueueWithItemCollection:_userMediaItemCollection];
+    [self.musicPlayer setNowPlayingItem:item];
+    [self.musicPlayer play];
+}
+
+#pragma mark -
+#pragma mark Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([_userMediaItemCollection.items count] > 0) {
+        MPMediaItem *item = [[_userMediaItemCollection items] objectAtIndex:[indexPath row]];
+        // Play the item using MPMusicPlayer
+        [self playWithMediaItem:item];
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+#pragma mark - TableView Datasource
+
+// Return the number of rows in the section.
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return [_userMediaItemCollection.items count];
+}
+
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSString *cellIdentifier = @"SongCell";
+    UITableViewCell  *cell = (UITableViewCell*)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    
+	if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleGray];
+    }
+    
+    MPMediaItem *anItem = (MPMediaItem *)[_userMediaItemCollection.items objectAtIndex: [indexPath row]];
+    
+    UIImageView *iconImage = (UIImageView *)[cell viewWithTag:1];
+    iconImage.image = [UIImage imageNamed:@"Profile_image.png"];
+    iconImage.layer.cornerRadius = iconImage.bounds.size.width / 2;
+    [PIUtility applyTwoCornerMask:iconImage.layer withRadius:15];
+    
+    UILabel *songNameLbl = (UILabel *)[cell viewWithTag:2];
+    if (anItem) {
+        [songNameLbl setText:[anItem valueForProperty:MPMediaItemPropertyTitle]];
+    }
+    
+    UILabel *singerNameLbl = (UILabel *)[cell viewWithTag:3];
+    if (anItem) {
+        [singerNameLbl setText:[anItem valueForProperty:MPMediaItemPropertyAlbumTitle]];
+    }
+    
+    UIImageView *favouritesImg = (UIImageView *)[cell viewWithTag:4];
+    [favouritesImg setImage:[UIImage imageNamed:@"favourites.png"]];
+    
+    return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 60.0f;
+}
+
 
 #pragma mark - Burger Menu Button
 
@@ -90,46 +223,6 @@
     else {
         [self.optionIndices removeIndex:index];
     }
-}
-
-#pragma mark - TableView Datasource
-
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *cellIdentifier = @"SongCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-    }
-    
-    UIImageView *iconImage = (UIImageView *)[cell viewWithTag:1];
-    iconImage.image = [UIImage imageNamed:@"Profile_image.png"];
-    iconImage.layer.cornerRadius = iconImage.bounds.size.width / 2;
-    [PIUtility applyTwoCornerMask:iconImage.layer withRadius:15];
-    
-    UILabel *songNameLbl = (UILabel *)[cell viewWithTag:2];
-    [songNameLbl setText:@"Im gonna find another you"];
-    
-    UILabel *singerNameLbl = (UILabel *)[cell viewWithTag:3];
-    [singerNameLbl setText:@"John Mayer"];
-    
-    UIImageView *favouritesImg = (UIImageView *)[cell viewWithTag:4];
-    [favouritesImg setImage:[UIImage imageNamed:@"favourites.png"]];
-    
-    return cell;
-}
-
--(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 10;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 60.0f;
-}
-
-#pragma mark - TableView Delegate
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath  {
-    
 }
 
 @end

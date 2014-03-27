@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC40A37618E3F4DE000F822F /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC40A37518E3F4DE000F822F /* AVFoundation.framework */; };
+		BC40A37818E3F53E000F822F /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BC40A37718E3F53E000F822F /* MediaPlayer.framework */; };
 		BCD41FA018E2EE8000DAF3D6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCD41F9F18E2EE8000DAF3D6 /* Foundation.framework */; };
 		BCD41FA218E2EE8000DAF3D6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCD41FA118E2EE8000DAF3D6 /* CoreGraphics.framework */; };
 		BCD41FA418E2EE8000DAF3D6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BCD41FA318E2EE8000DAF3D6 /* UIKit.framework */; };
@@ -65,6 +67,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BC40A37518E3F4DE000F822F /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		BC40A37718E3F53E000F822F /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		BC40A37B18E406E7000F822F /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		BCD41F9C18E2EE8000DAF3D6 /* PlayIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlayIt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BCD41F9F18E2EE8000DAF3D6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BCD41FA118E2EE8000DAF3D6 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -126,6 +131,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC40A37818E3F53E000F822F /* MediaPlayer.framework in Frameworks */,
+				BC40A37618E3F4DE000F822F /* AVFoundation.framework in Frameworks */,
 				BCD41FA218E2EE8000DAF3D6 /* CoreGraphics.framework in Frameworks */,
 				BCD41FA418E2EE8000DAF3D6 /* UIKit.framework in Frameworks */,
 				BCD41FA018E2EE8000DAF3D6 /* Foundation.framework in Frameworks */,
@@ -167,6 +174,8 @@
 		BCD41F9E18E2EE8000DAF3D6 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BC40A37718E3F53E000F822F /* MediaPlayer.framework */,
+				BC40A37518E3F4DE000F822F /* AVFoundation.framework */,
 				BCD41F9F18E2EE8000DAF3D6 /* Foundation.framework */,
 				BCD41FA118E2EE8000DAF3D6 /* CoreGraphics.framework */,
 				BCD41FA318E2EE8000DAF3D6 /* UIKit.framework */,
@@ -305,6 +314,7 @@
 			children = (
 				BCD4204518E3104E00DAF3D6 /* PIUtility.h */,
 				BCD4204618E3104E00DAF3D6 /* PIUtility.m */,
+				BC40A37B18E406E7000F822F /* Constants.h */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -658,6 +668,7 @@
 				BCD41FD018E2EE8100DAF3D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		BCD41FD118E2EE8100DAF3D6 /* Build configuration list for PBXNativeTarget "PlayItTests" */ = {
 			isa = XCConfigurationList;
@@ -666,6 +677,7 @@
 				BCD41FD318E2EE8100DAF3D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

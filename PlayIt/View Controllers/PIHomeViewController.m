@@ -15,6 +15,7 @@
 {
     BOOL setAlernativeColor;
     MPMediaItemCollection	*_userMediaItemCollection;
+    MPMediaItem *currentMediaItem;
 }
 
 @property (nonatomic, strong) NSMutableIndexSet *optionIndices;
@@ -24,6 +25,8 @@
 
 @implementation PIHomeViewController
 
+#pragma mark - Default Methods
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -32,7 +35,11 @@
     setAlernativeColor = NO;
     
     // To fetch media files from phone library
-    [self pickAudioFiles];
+    //[self pickAudioFiles];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [self setPlayerViewData];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -112,12 +119,57 @@
     [self.songTableView reloadData];
 }
 
-#pragma mark - Play 
+#pragma mark - Common Methods
+
 -(void)playWithMediaItem:(MPMediaItem *)item {
     self.musicPlayer = [MPMusicPlayerController iPodMusicPlayer];
     [self.musicPlayer setQueueWithItemCollection:_userMediaItemCollection];
     [self.musicPlayer setNowPlayingItem:item];
+    [self playerPlay:nil];
+    
+    // Set current player Data
+    [self setPlayerViewData];
+}
+
+-(void)setPlayerViewData {
+    currentMediaItem = self.musicPlayer.nowPlayingItem;
+    if (currentMediaItem) {
+        self.currentSongLbl.text = [NSString stringWithFormat:@"%@", [currentMediaItem valueForProperty:MPMediaItemPropertyTitle]];
+        self.currentSongArtistLbl.text = [NSString stringWithFormat:@"%@", [currentMediaItem valueForProperty:MPMediaItemPropertyAlbumTitle]];
+    }
+}
+
+#pragma mark - Player Methods
+
+- (IBAction)playerRewind:(id)sender {
+    [self.musicPlayer skipToPreviousItem];
+    // Set current player Data
+    [self setPlayerViewData];
+}
+
+-(void)playerPlay:(id)sender {
+    // Show the play view
+    [self.playerView setHidden:NO];
+    
+    // Set new frame for list view
+    CGRect frame = self.songTableView.frame;
+    frame.size.height -= 100.0f - frame.origin.y;
+    frame.origin.y = 100.0f;
+    self.songTableView.frame = frame;
+    
+    // Play music file
     [self.musicPlayer play];
+}
+
+-(void)playerPause:(id)sender {
+    // Pause music file
+    [self.musicPlayer pause];
+}
+
+-(void)playerForward:(id)sender {
+    [self.musicPlayer skipToNextItem];
+    // Set current player Data
+    [self setPlayerViewData];
 }
 
 #pragma mark -
@@ -125,9 +177,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([_userMediaItemCollection.items count] > 0) {
-        MPMediaItem *item = [[_userMediaItemCollection items] objectAtIndex:[indexPath row]];
+        currentMediaItem = [[_userMediaItemCollection items] objectAtIndex:[indexPath row]];
         // Play the item using MPMusicPlayer
-        [self playWithMediaItem:item];
+        [self playWithMediaItem:currentMediaItem];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -210,7 +262,6 @@
 #pragma mark - RNFrostedSidebarDelegate
 
 - (void)sidebar:(RNFrostedSidebar *)sidebar didTapItemAtIndex:(NSUInteger)index {
-    NSLog(@"Tapped item at index %i",index);
     if (index == 3) {
         [sidebar dismissAnimated:YES completion:nil];
     }

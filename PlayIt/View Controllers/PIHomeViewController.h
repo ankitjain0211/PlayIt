@@ -14,4 +14,13 @@
 @interface PIHomeViewController : UIViewController <RNFrostedSidebarDelegate, MPMediaPickerControllerDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *songTableView;
 
+// Player View
+@property (weak, nonatomic) IBOutlet UIView *playerView;
+@property (weak, nonatomic) IBOutlet UILabel *currentSongLbl;
+@property (weak, nonatomic) IBOutlet UILabel *currentSongArtistLbl;
+- (IBAction)playerRewind:(id)sender;
+- (IBAction)playerPlay:(id)sender;
+- (IBAction)playerPause:(id)sender;
+- (IBAction)playerForward:(id)sender;
+
 @end

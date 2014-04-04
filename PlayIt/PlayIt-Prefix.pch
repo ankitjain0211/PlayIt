@@ -15,4 +15,5 @@
     #import <Foundation/Foundation.h>
     #import "PIUtility.h"
     #import "Classes/Constants.h"
+    #import "SNLog.h"
 #endif

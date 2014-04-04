@@ -7,7 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <FacebookSDK/FacebookSDK.h>
 
-@interface PIProfileViewController : UIViewController
+@interface PIProfileViewController : UIViewController <FBLoginViewDelegate>
+{
+    NSString *userName, *userLocation, *userCompany, *userGender;
+}
+
+@property (weak, nonatomic) IBOutlet FBLoginView *fbLoginView;
+@property (weak, nonatomic) IBOutlet UIView *profileView;
+@property (weak, nonatomic) IBOutlet UIImageView *profileImageView;
+@property (weak, nonatomic) IBOutlet UILabel *profileUserName;
+@property (weak, nonatomic) IBOutlet UILabel *profileCompanyName;
+@property (weak, nonatomic) IBOutlet UILabel *ProfileUserLocation;
 
 @end
